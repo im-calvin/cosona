@@ -108,15 +108,15 @@ const ChatDesignA: NextPage = () => {
               <CosanaBtn text="" href="/Create" icon="create" type="createbtnmd" />
               <CosanaBtn text="" href="/Personas" icon="persona" type="personasbtnmd" />
             </div>
-            <MenuBtn name="Character 1" href="" selected={true} />
-            <MenuBtn name="Character 2" href="" selected={false} />
-            <MenuBtn name="Character 3" href="" selected={false} />
-            <MenuBtn name="Character 4" href="" selected={false} />
-            <MenuBtn name="Character 5" href="" selected={false} />
+            <MenuBtn name="Character 1"  selected={true} />
+            <MenuBtn name="Character 2" href="/Chat?character=tonystark" selected={false} />
+            <MenuBtn name="Character 3"  selected={false} />
+            <MenuBtn name="Character 4"  selected={false} />
+            <MenuBtn name="Character 5"  selected={false} />
           </div>
         </div>
         <div className={styles.colRight}>
-          {/* div for storing all messages, so append them here */}
+       
           <div className={styles.responseContainer}>
             <div>
               {chat.map((message, index) => {
@@ -135,7 +135,6 @@ const ChatDesignA: NextPage = () => {
           </div>
 
           <div className={styles.chatContainer}>
-            {/* u might need to fix this to append with the content above */}
             <form onSubmit={handleSubmit} className={styles.inputContainer}>
               <textarea
                 className={styles.inputContainer}
@@ -149,6 +148,8 @@ const ChatDesignA: NextPage = () => {
               </button>
             </form>
           </div>
+
+
         </div>
       </div>
     </div>

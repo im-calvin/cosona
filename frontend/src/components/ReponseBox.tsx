@@ -1,6 +1,6 @@
 // ResponseBox.js
 import React from "react";
-import styles from "./card.module.css";
+import styles from "./responseBox.module.css";
 import Image from "next/image";
 
 interface ResponseBoxProps {
@@ -10,7 +10,7 @@ interface ResponseBoxProps {
 }
 
 const ResponseBox: React.FC<ResponseBoxProps> = ({ response, name, pictureSrc }) => {
-  const isUser = name.trim() === "";
+  const isUser = name.trim() === "You";
   const defaultPicture = "user-alt.svg";
 
   return (
