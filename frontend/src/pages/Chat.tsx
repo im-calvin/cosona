@@ -11,10 +11,11 @@ import ResponseBox from "@/components/ReponseBox";
 
 const ChatDesignA: NextPage = () => {
   // odd is user input, even is chatbot output
-  const [chat, setChat] = useState<string[]>([]);
+  const [chat, setChat] = useState<{ message: string; loading: boolean }[]>([]);
   const [textareaInput, setTextareaInput] = useState<string>("");
   const [waitingForChat, setWaitingForChat] = useState<boolean>(true);
   const [character, setCharacter] = useState<string | null>("");
+
 
   // Event handler to update the state when the textarea value changes
   const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -24,13 +25,56 @@ const ChatDesignA: NextPage = () => {
   // Event handler for the form submission
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const newChat = [...chat, textareaInput];
+    
+    // Determine if the submission is odd or even
+    const isOddSubmission = chat.length % 2 !== 0;
+  
+    // Set loading state based on the submission type
+    const newChatMessage = { message: textareaInput, loading: isOddSubmission };
+    
+    const newChat = [...chat, newChatMessage];
     setChat(newChat);
     setWaitingForChat(true);
-
+  
     // parse json for display, and then set that to the chat state
     setTextareaInput("");
+  
+    // Assuming you want to fetch the response after submitting the form
+    if (isOddSubmission) {
+      fetchChat(newChatMessage);
+    }
   };
+  
+  const fetchChat = async (newChatMessage: { message: string; loading: boolean }) => {
+    try {
+      const response = await fetch(`${getAPIEndpoint()}/api/chat`, {
+        method: "POST",
+        body: JSON.stringify({
+          text: chat.map((msg) => msg.message), // Assuming you want to send all messages for context
+          character: character,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+  
+      const json = await response.json();
+      const updatedChat = chat.map((msg) =>
+        msg === newChatMessage ? { ...msg, loading: false } : msg
+      );
+      setChat([...updatedChat, { message: json.message, loading: false }]);
+      setWaitingForChat(false);
+    } catch (error) {
+      console.error("Error fetching chat:", error);
+      // Handle error (e.g., set loading to false and display an error message)
+      const updatedChat = chat.map((msg) =>
+        msg === newChatMessage ? { ...msg, loading: false } : msg
+      );
+      setChat(updatedChat);
+      setWaitingForChat(false);
+    }
+  };
+  
 
   // on page load, fetch the character we need to get from thee url
   useEffect(() => {
@@ -57,24 +101,24 @@ const ChatDesignA: NextPage = () => {
     if (isMount || !waitingForChat || !character) {
       return;
     }
-    const fetchChat = async () => {
-      console.log("fetching chat");
-      const response = await fetch(`${getAPIEndpoint()}/api/chat`, {
-        method: "POST",
-        body: JSON.stringify({
-          text: chat,
-          character: character,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const json = await response.json();
-      console.log(json);
-      setChat([...chat, json.message]);
-      setWaitingForChat(false);
-    };
-    fetchChat();
+    // const fetchChat = async () => {
+    //   console.log("fetching chat");
+    //   const response = await fetch(`${getAPIEndpoint()}/api/chat`, {
+    //     method: "POST",
+    //     body: JSON.stringify({
+    //       text: chat,
+    //       character: character,
+    //     }),
+    //     headers: {
+    //       "Content-Type": "application/json",
+    //     },
+    //   });
+    //   const json = await response.json();
+    //   console.log(json);
+    //   setChat([...chat, json.message]);
+    //   setWaitingForChat(false);
+    // };
+    // fetchChat();
   }, [chat]);
 
   return (
@@ -119,18 +163,18 @@ const ChatDesignA: NextPage = () => {
        
           <div className={styles.responseContainer}>
             <div>
-              {chat.map((message, index) => {
-                return (
-                  <ResponseBox
-                    key={index}
-                    response={message}
-                    name={index % 2 === 0 ? "You" : `${character}`}
-                    pictureSrc={
-                      index % 2 === 0 ? "" : `${convertCharToImgSrc(character as string)}`
-                    }
-                  />
-                );
-              })}
+              {chat.map((message, index) => (
+  <ResponseBox
+    key={index}
+    response={message.message}
+    name={index % 2 === 0 ? "You" : `${character}`}
+    pictureSrc={
+      index % 2 === 0 ? "" : `${convertCharToImgSrc(character as string)}`
+    }
+    loading={message.loading}
+  />
+))}
+
             </div>
           </div>
 
