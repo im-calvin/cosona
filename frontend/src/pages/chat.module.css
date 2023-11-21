@@ -118,8 +118,7 @@
 .colRight {
   align-content: stretch;
   width: 100%;
-  /*
-  align-items: center; */
+  align-self: center; 
   text-align: left;
   font-size: var(--font-size-16xl);
   border-style: dotted;
@@ -130,7 +129,7 @@
   align-content: stretch;
 }
 .chatContainer{
-  height: 25vh;
+  height: 15vh;
   display: flex;
   padding: 40px 20px;
   justify-content: center;

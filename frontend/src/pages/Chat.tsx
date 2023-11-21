@@ -18,6 +18,9 @@ const ChatDesignA: NextPage = () => {
 
   // Event handler to update the state when the textarea value changes
   const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (event.target.value === "\n") {
+      return;
+    }
     setTextareaInput(event.target.value);
   };
 
@@ -146,13 +149,15 @@ const ChatDesignA: NextPage = () => {
                 placeholder={`Type a message to ${character}`}
                 disabled={!character || waitingForChat}
                 onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
+                  if (e.key === "Enter" && !e.shiftKey && textareaInput !== "") {
                     e.preventDefault();
                     handleSubmit(e);
                   }
                 }}
               />
-              <button type="submit">
+              <button
+                style={{ alignSelf: "center", background: "none", border: "none" }}
+                type="submit">
                 <MdOutlineSend />
               </button>
             </form>
