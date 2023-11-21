@@ -58,6 +58,7 @@ const ChatDesignA: NextPage = () => {
   // newChat holds previous chats + current input
   // chat holds previous chats + current input + loading message
   const fetchChat = async (newChat: TChat[]) => {
+    newChat.pop(); // remove the loading message
     const chatStr = newChat.map((message) => message.message);
     try {
       const response = await fetch(`${getAPIEndpoint()}/api/chat`, {
