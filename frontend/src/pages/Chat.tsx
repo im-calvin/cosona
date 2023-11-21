@@ -13,7 +13,7 @@ const ChatDesignA: NextPage = () => {
   // odd is user input, even is chatbot output
   const [chat, setChat] = useState<string[]>([]);
   const [textareaInput, setTextareaInput] = useState<string>("");
-  const [waitingForChat, setWaitingForChat] = useState<boolean>(true);
+  const [waitingForChat, setWaitingForChat] = useState<boolean>(false);
   const [character, setCharacter] = useState<string | null>("");
 
   // Event handler to update the state when the textarea value changes
@@ -22,7 +22,9 @@ const ChatDesignA: NextPage = () => {
   };
 
   // Event handler for the form submission
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
     event.preventDefault();
     const newChat = [...chat, textareaInput];
     setChat(newChat);
@@ -71,11 +73,13 @@ const ChatDesignA: NextPage = () => {
       });
       const json = await response.json();
       console.log(json);
-      setChat([...chat, json.message]);
       setWaitingForChat(false);
+      setChat([...chat, json.message]);
     };
     fetchChat();
   }, [chat]);
+
+  console.log(waitingForChat);
 
   return (
     <div className={styles.chatDesignA}>
@@ -108,15 +112,14 @@ const ChatDesignA: NextPage = () => {
               <CosanaBtn text="" href="/Create" icon="create" type="createbtnmd" />
               <CosanaBtn text="" href="/Personas" icon="persona" type="personasbtnmd" />
             </div>
-            <MenuBtn name="Character 1"  selected={true} />
+            <MenuBtn name="Character 1" selected={true} />
             <MenuBtn name="Character 2" href="/Chat?character=tonystark" selected={false} />
-            <MenuBtn name="Character 3"  selected={false} />
-            <MenuBtn name="Character 4"  selected={false} />
-            <MenuBtn name="Character 5"  selected={false} />
+            <MenuBtn name="Character 3" selected={false} />
+            <MenuBtn name="Character 4" selected={false} />
+            <MenuBtn name="Character 5" selected={false} />
           </div>
         </div>
         <div className={styles.colRight}>
-       
           <div className={styles.responseContainer}>
             <div>
               {chat.map((message, index) => {
@@ -141,15 +144,19 @@ const ChatDesignA: NextPage = () => {
                 onChange={handleTextareaChange}
                 value={textareaInput}
                 placeholder={`Type a message to ${character}`}
-                disabled={!character}
+                disabled={!character || waitingForChat}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
               />
               <button type="submit">
                 <MdOutlineSend />
               </button>
             </form>
           </div>
-
-
         </div>
       </div>
     </div>
