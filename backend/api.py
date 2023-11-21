@@ -25,7 +25,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import LLMChain
 import json
 
-load_dotenv()
+load_dotenv() 
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000", "https://cosona.vercel.app"])
 dbClient = MongoClient(os.getenv("ATLAS_URI"))
