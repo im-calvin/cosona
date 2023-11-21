@@ -126,7 +126,9 @@
 .responseContainer{ 
   height: 70vh; 
   overflow: scroll;
-  align-content: stretch;
+  align-content: stretch;  
+  display:flex;
+  flex-direction:column;
 }
 .chatContainer{
   height: 15vh;

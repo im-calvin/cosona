@@ -160,6 +160,11 @@ const ChatDesignA: NextPage = () => {
                 />
               ))}
             </div>
+
+            {/* if !character */}
+            {!character && (
+              <CosanaBtn text="Go to Personas" href="/Personas" icon="persona" type="personabtn" />
+            )}
           </div>
 
           <div className={styles.chatContainer}>
