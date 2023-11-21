@@ -5,12 +5,13 @@ import styles from "./btn.module.css";
 
 interface MenuBtnProps {
   name: string;
-  href: string;
   selected: boolean;
+  href?: string;
   imageType?: "user" | "star" | "naruto" | "avenger" | "hp" | "misc" | ""; // New prop for image type
+  onClick?: () => void; // Add this line
 }
 
-const MenuBtn: React.FC<MenuBtnProps> = ({ name, href, selected, imageType = "user" }) => {
+const MenuBtn: React.FC<MenuBtnProps> = ({ name, href = '', selected, imageType = "user", onClick }) => {
   const type = selected ? "selectedBtn" : "normalBtn";
 
   const getImageSource = () => {
@@ -33,10 +34,10 @@ const MenuBtn: React.FC<MenuBtnProps> = ({ name, href, selected, imageType = "us
   };
 
   return (
-    <Link href={href} className={`${styles[type]}`}>
-      <Image className={styles.userAltIcon} alt="" src={getImageSource()} width={30} height={41} />
-      <div className={styles.characterTxt}>{name}</div>
-    </Link>
+      <Link href={href} onClick={onClick} className={`${styles[type]}`}>
+        <Image className={styles.userAltIcon} alt="" src={getImageSource()} width={30} height={41} />
+        <div className={styles.characterTxt}>{name}</div>
+      </Link>
   );
 };
 

@@ -9,27 +9,85 @@ import MenuBtn from "@/components/MenuBtn";
 import { getAPIEndpoint } from "./index";
 import ResponseBox from "@/components/ReponseBox";
 
+type TChat = {
+  message: string;
+  loading: boolean;
+};
+
 const ChatDesignA: NextPage = () => {
   // odd is user input, even is chatbot output
-  const [chat, setChat] = useState<string[]>([]);
+  const [chat, setChat] = useState<TChat[]>([]);
   const [textareaInput, setTextareaInput] = useState<string>("");
-  const [waitingForChat, setWaitingForChat] = useState<boolean>(true);
+  const [waitingForChat, setWaitingForChat] = useState<boolean>(false);
   const [character, setCharacter] = useState<string | null>("");
 
   // Event handler to update the state when the textarea value changes
   const handleTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    if (event.target.value === "\n") {
+      return;
+    }
     setTextareaInput(event.target.value);
   };
 
   // Event handler for the form submission
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement> | React.KeyboardEvent<HTMLTextAreaElement>
+  ) => {
     event.preventDefault();
-    const newChat = [...chat, textareaInput];
-    setChat(newChat);
+
+    const currentInput = textareaInput.trim();
+
+    // Determine if the submission is odd or even
+    const isOddSubmission = chat.length % 2 !== 0;
+
+    // Set loading state based on the submission type
+    const newChatMessage = { message: currentInput, loading: isOddSubmission };
+
+    const newChat = [...chat, newChatMessage, { message: "loading", loading: false }];
+    setChat(newChat); // add loading message to chat
     setWaitingForChat(true);
 
     // parse json for display, and then set that to the chat state
     setTextareaInput("");
+
+    // fetch response from bot
+    // states are async
+    fetchChat(newChat);
+  };
+
+  // newChat holds previous chats + current input
+  // chat holds previous chats + current input + loading message
+  const fetchChat = async (newChat: TChat[]) => {
+    const chatStr = newChat.map((message) => message.message);
+    try {
+      const response = await fetch(`${getAPIEndpoint()}/api/chat`, {
+        method: "POST",
+        body: JSON.stringify({
+          text: chatStr, // Assuming you want to send all messages for context
+          character: character,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const json = await response.json();
+      // copy the array, mutate the copy, then set the state
+      const chatCopy = [...newChat];
+      chatCopy[chatCopy.length - 1].loading = false; // un"loading" the loading message
+      chatCopy[chatCopy.length - 1].message = json.message; // set the last message to the response
+      console.log(chatCopy);
+      setChat(chatCopy); // un"loading" the loading message
+    } catch (error) {
+      console.error("Error fetching chat:", error);
+      // copy the array, mutate the copy, then set the state
+      const chatCopy = [...chat];
+      console.log(chat);
+      chatCopy[chatCopy.length - 1].loading = false; // un"loading" the loading message
+      chatCopy[chatCopy.length - 1].message = error as string; // set the last message to the response
+      setChat(chatCopy); // un"loading" the loading message
+    }
+    setWaitingForChat(false);
   };
 
   // on page load, fetch the character we need to get from thee url
@@ -50,32 +108,6 @@ const ChatDesignA: NextPage = () => {
     }, []);
     return isMountRef.current;
   };
-
-  const isMount = useIsMount();
-
-  useEffect(() => {
-    if (isMount || !waitingForChat || !character) {
-      return;
-    }
-    const fetchChat = async () => {
-      console.log("fetching chat");
-      const response = await fetch(`${getAPIEndpoint()}/api/chat`, {
-        method: "POST",
-        body: JSON.stringify({
-          text: chat,
-          character: character,
-        }),
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      const json = await response.json();
-      console.log(json);
-      setChat([...chat, json.message]);
-      setWaitingForChat(false);
-    };
-    fetchChat();
-  }, [chat]);
 
   return (
     <div className={styles.chatDesignA}>
@@ -108,43 +140,51 @@ const ChatDesignA: NextPage = () => {
               <CosanaBtn text="" href="/Create" icon="create" type="createbtnmd" />
               <CosanaBtn text="" href="/Personas" icon="persona" type="personasbtnmd" />
             </div>
-            <MenuBtn name="Character 1" href="" selected={true} />
-            <MenuBtn name="Character 2" href="" selected={false} />
-            <MenuBtn name="Character 3" href="" selected={false} />
-            <MenuBtn name="Character 4" href="" selected={false} />
-            <MenuBtn name="Character 5" href="" selected={false} />
+            <MenuBtn name="Character 1" selected={true} />
+            <MenuBtn name="Character 2" href="/Chat?character=tonystark" selected={false} />
+            <MenuBtn name="Character 3" selected={false} />
+            <MenuBtn name="Character 4" selected={false} />
+            <MenuBtn name="Character 5" selected={false} />
           </div>
         </div>
         <div className={styles.colRight}>
-          {/* div for storing all messages, so append them here */}
           <div className={styles.responseContainer}>
             <div>
-              {chat.map((message, index) => {
-                return (
-                  <ResponseBox
-                    key={index}
-                    response={message}
-                    name={index % 2 === 0 ? "You" : `${character}`}
-                    pictureSrc={
-                      index % 2 === 0 ? "" : `${convertCharToImgSrc(character as string)}`
-                    }
-                  />
-                );
-              })}
+              {chat.map((message, index) => (
+                <ResponseBox
+                  key={index}
+                  response={message.message}
+                  name={index % 2 === 0 ? "You" : `${character}`}
+                  pictureSrc={index % 2 === 0 ? "" : `${convertCharToImgSrc(character as string)}`}
+                  loading={message.loading}
+                />
+              ))}
             </div>
+
+            {/* if !character */}
+            {!character && (
+              <CosanaBtn text="Go to Personas" href="/Personas" icon="persona" type="personabtn" />
+            )}
           </div>
 
           <div className={styles.chatContainer}>
-            {/* u might need to fix this to append with the content above */}
             <form onSubmit={handleSubmit} className={styles.inputContainer}>
               <textarea
                 className={styles.inputContainer}
                 onChange={handleTextareaChange}
                 value={textareaInput}
                 placeholder={`Type a message to ${character}`}
-                disabled={!character}
+                disabled={!character || waitingForChat}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey && textareaInput !== "") {
+                    e.preventDefault();
+                    handleSubmit(e);
+                  }
+                }}
               />
-              <button type="submit">
+              <button
+                style={{ alignSelf: "center", background: "none", border: "none" }}
+                type="submit">
                 <MdOutlineSend />
               </button>
             </form>

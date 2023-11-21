@@ -1,16 +1,17 @@
 // ResponseBox.js
 import React from "react";
-import styles from "./card.module.css";
+import styles from "./responseBox.module.css";
 import Image from "next/image";
 
 interface ResponseBoxProps {
   response: string;
   name: string;
   pictureSrc?: string; // Make pictureSrc optional
+  loading?: boolean;
 }
 
-const ResponseBox: React.FC<ResponseBoxProps> = ({ response, name, pictureSrc }) => {
-  const isUser = name.trim() === "";
+const ResponseBox: React.FC<ResponseBoxProps> = ({ response, name, loading, pictureSrc }) => {
+  const isUser = name.trim() === "You";
   const defaultPicture = "user-alt.svg";
 
   return (
@@ -22,6 +23,9 @@ const ResponseBox: React.FC<ResponseBoxProps> = ({ response, name, pictureSrc })
         width="42"
         height="42"
       />
+      {loading ? (
+        <div>Loading...</div>
+      ) : (
       <div className={styles.content}>
         {isUser ? (
           <>
@@ -33,8 +37,9 @@ const ResponseBox: React.FC<ResponseBoxProps> = ({ response, name, pictureSrc })
             <span className={styles.name}>{name}:</span>
             <span className={styles.response}>{response}</span>
           </>
-        )}
+        )}        
       </div>
+      )}
     </div>
   );
 };

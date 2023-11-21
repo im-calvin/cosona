@@ -8,7 +8,16 @@ import CosanaBtn from "@/components/CosanaBtn";
 import MenuBtn from "@/components/MenuBtn";
 import CharacterCard from "@/components/CharacterCard"; // Adjust the path based on your project structure
 
+
+
 const PersonasDesignA: NextPage = () => {
+  const [selectedMenu, setSelectedMenu] = useState('My Personas');
+
+  const handleMenuClick = (menuName: string) => {
+    setSelectedMenu(menuName);
+  };
+
+  
   const [file, setFile] = useState<any>();
 
   const handleFileUpload = async () => {
@@ -57,22 +66,17 @@ const PersonasDesignA: NextPage = () => {
               <CosanaBtn text="" href="/Create" icon="create" type="createbtnmd" />
               <CosanaBtn text="" href="/Chat" icon="chat" type="chatbtnmd" />
             </div>
-            <MenuBtn name="My Personas" href="" selected={true} imageType="" />
-            <MenuBtn name="Star Wars" href="" selected={false} imageType="star" />
-            <MenuBtn name="Naruto" href="" selected={false} imageType="naruto" />
-            <MenuBtn name="Harry Potter" href="" selected={false} imageType="hp" />
-            <MenuBtn name="Miscellaneous" href="" selected={false} imageType="misc" />
+            <MenuBtn name="My Personas" selected={selectedMenu === 'My Personas'} imageType="" onClick={() => handleMenuClick('My Personas')} />
+<MenuBtn name="Star Wars" selected={selectedMenu === 'Star Wars'} imageType="star" onClick={() => handleMenuClick('Star Wars')} />
+<MenuBtn name="Naruto" selected={selectedMenu === 'Naruto'} imageType="naruto" onClick={() => handleMenuClick('Naruto')} />
+<MenuBtn name="Harry Potter" selected={selectedMenu === 'Harry Potter'} imageType="hp" onClick={() => handleMenuClick('Harry Potter')} />
+<MenuBtn name="Miscellaneous" selected={selectedMenu === 'Miscellaneous'} imageType="misc" onClick={() => handleMenuClick('Miscellaneous')} />
           </div>
         </div>
         <div className={styles.colRight}>
           <div className={styles.peopleBoxWrapper}>
             <div className={styles.peopleBox}>
-              <CharacterCard
-                src=""
-                characterName="Your Own Character"
-                seriesName=""
-                chatUrl="/Create"
-              />
+              {selectedMenu === 'My Personas' && <><CharacterCard src="" characterName="Your Own Character" seriesName="" chatUrl="/Create" />
               <CharacterCard
                 src="sasuke.svg"
                 characterName="Sasuke"
@@ -108,7 +112,16 @@ const PersonasDesignA: NextPage = () => {
                 characterName="Sherlock Holmes"
                 seriesName="Sherlock Holmes"
                 chatUrl="/Chat?character=sherlockholmes"
-              />
+              />     </>             
+              
+              
+              }
+{selectedMenu === 'Naruto' && <CharacterCard src="sasuke.svg" characterName="Sasuke" seriesName="Naruto" chatUrl="/Chat?character=sasuke" />}
+{selectedMenu === 'Miscellaneous' && <CharacterCard src="tony.svg" characterName="Tony Stark" seriesName="Marvel" chatUrl="/Chat?character=tonystark" />}
+{selectedMenu === 'Star Wars' && <CharacterCard src="yoda.svg" characterName="Yoda" seriesName="Star Wars" chatUrl="/Chat?character=yoda" />}
+{selectedMenu === 'Harry Potter' && <CharacterCard src="harry.svg" characterName="Harry Potter" seriesName="Harry Potter" chatUrl="/Chat?character=harrypotter" />}
+{selectedMenu === 'Miscellaneous' && <CharacterCard src="rick.svg" characterName="Rick Sanchez" seriesName="Rick and Morty" chatUrl="/Chat?character=ricksanchez" />}
+{selectedMenu === 'Miscellaneous' && <CharacterCard src="sherlock.svg" characterName="Sherlock Holmes" seriesName="Sherlock Holmes" chatUrl="/Chat?character=sherlockholmes" />}
             </div>
           </div>
         </div>
