@@ -41,9 +41,11 @@ const ChatDesignA: NextPage = () => {
     const isOddSubmission = chat.length % 2 !== 0;
 
     // Set loading state based on the submission type
-    const newChatMessage = { message: currentInput, loading: isOddSubmission };
-
-    const newChat = [...chat, newChatMessage, { message: "loading", loading: false }];
+    const newChat = [
+      ...chat,
+      { message: currentInput, loading: isOddSubmission },
+      { message: "loading", loading: false },
+    ];
     setChat(newChat); // add loading message to chat
     setWaitingForChat(true);
 
@@ -55,11 +57,15 @@ const ChatDesignA: NextPage = () => {
     fetchChat(newChat);
   };
 
-  // newChat holds previous chats + current input
+  // newChat holds previous chats + current input + loading message
   // chat holds previous chats + current input + loading message
-  const fetchChat = async (newChat: TChat[]) => {
-    newChat.pop(); // remove the loading message
-    const chatStr = newChat.map((message) => message.message);
+  const fetchChat = async (allChats: TChat[]) => {
+    const allChatsCopy = [...allChats];
+    const chatNoLoading = allChatsCopy.pop(); // remove the loading message
+    if (chatNoLoading === undefined) {
+      throw new Error("chatNoLoading is undefined");
+    }
+    const chatStr = allChatsCopy.map((message) => message.message);
     try {
       const response = await fetch(`${getAPIEndpoint()}/api/chat`, {
         method: "POST",
@@ -74,16 +80,14 @@ const ChatDesignA: NextPage = () => {
 
       const json = await response.json();
       // copy the array, mutate the copy, then set the state
-      const chatCopy = [...newChat];
+      const chatCopy = [...allChats];
       chatCopy[chatCopy.length - 1].loading = false; // un"loading" the loading message
       chatCopy[chatCopy.length - 1].message = json.message; // set the last message to the response
-      console.log(chatCopy);
       setChat(chatCopy); // un"loading" the loading message
     } catch (error) {
       console.error("Error fetching chat:", error);
       // copy the array, mutate the copy, then set the state
       const chatCopy = [...chat];
-      console.log(chat);
       chatCopy[chatCopy.length - 1].loading = false; // un"loading" the loading message
       chatCopy[chatCopy.length - 1].message = error as string; // set the last message to the response
       setChat(chatCopy); // un"loading" the loading message
