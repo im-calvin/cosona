@@ -4,8 +4,10 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 from werkzeug.utils import secure_filename
 import pprint
+from co import *
 import os
-from constants import ALLOWED_EXTENSIONS, PROMPTS, NEW_PROMPTS
+import gridfs
+from constants import COLLECTION_NAME, ALLOWED_EXTENSIONS, PROMPTS, NEW_PROMPTS
 from db import store_pdf
 from langchain.chat_models import ChatCohere
 from langchain.memory import ConversationBufferMemory
@@ -25,7 +27,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.chains import LLMChain
 import json
 
-load_dotenv() 
+load_dotenv()
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000", "https://cosona.vercel.app"])
 dbClient = MongoClient(os.getenv("ATLAS_URI"))
@@ -46,20 +48,29 @@ def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-# @app.route("/api/upload", methods=["GET", "POST"])
-# def upload_script():
-#     if request.method == "POST":
-#         if "file" not in request.files:
-#             printer.pprint("No file part")
-#         file = request.files["file"]
-#         # If the user does not select a file, the browser submits an
-#         # empty file without a filename.
-#         if file.filename == "":
-#             printer.pprint("No selected file")
-#         if file and allowed_file(file.filename):
-#             filename = secure_filename(file.filename)
-#             store_pdf(cohere_db, file, filename)
-#             printer.pprint(f"File saved {filename}")
+@app.route("/api/characters", methods=["GET"])
+def get_characters():
+    # gets a list of characters from the pdf, requires the fileId as a query parameter
+    fileId = request.args.get("fileId")
+    if fileId is None:
+        return {"error": "Please provide a fileId"}
+
+    # try to get the file from gridfs
+    fs = gridfs.GridFS(cohere_db, collection=COLLECTION_NAME)
+    pdf_file = fs.get(fileId)
+
+    if pdf_file is None:
+        return {"error": "File not found"}
+
+    # get the text from the pdf and then get the characters from the text
+    with open("pdf_file.pdf", "w") as f:
+        f.write(pdf_file)
+
+    text = get_pdf_text(pdf_file)
+
+    characters = get_character_list(text)
+
+    return {"characters": characters}
 
 
 @app.route("/api/chat", methods=["POST"])
@@ -72,63 +83,7 @@ def chat():
     response = get_response(chat_history, character)
 
     return response
-    
-def get_character_list(text):
-    user_input2 = """List the main cast characters from the movie script. Answer only this this FORMAT:
-                The list of characters are:
-                    -Character1 Full name
-                    -Character2 Full Name
-                    -Character3 Full Name
-                    -Character4 Full Name
-                    -Character5 Full Name
-                    Who would you like to talk to? """
-    # Define the character's name and description
-    text_splitter = RecursiveCharacterTextSplitter(separators=["\n"],chunk_size=2500, chunk_overlap=300)
-    texts = text_splitter.split_text(text)
-    # Initialize the chat model for the character
-    chat_model = ChatCohere(cohere_api_key=cohere_api_key, model='command-light',temperature=0.0)
-    embeddings = CohereEmbeddings(cohere_api_key=cohere_api_key)
-    # Create a vectorstore from documents
-    vectorstore = Chroma.from_texts(texts, embeddings)
-    # Create retriever interface
-    retriever=vectorstore.as_retriever()
-    # Create the memory object
-    memory=ConversationBufferMemory(
-      memory_key='chat_history', return_messages=True)
-    #prompt
-    custom_prompt_template = """
-                    {context}
-                    You are a character extracter bot. You're only job is to extract the main cast character names from a movie script.
-                    Main cast characters will have more than 15 lines of dialogue. Do not include character with less than 10 dialogues in the character list
-                    Extract the list of 5-6 main characters only from the movie script in the format
-                    FORMAT:
-                    The list of characters are:
-                        -Character1 Full name
-                        -Character2 Full Name
-                        -Character3 Full Name
-                        -Character4 Full Name
-                        -Character5 Full Name
-                        Who would you like to talk to? 
-    
-                    Always end the chat with "Who would you like to talk to?"
-    
-                    
-              
-            """
-    
-    prompt = PromptTemplate(template=custom_prompt_template,
-                    input_variables=['context', 'question'])
-    #list retrieval chain
-    chain = RetrievalQA.from_chain_type(llm=chat_model,
-                                    chain_type='stuff',
-                                    retriever=retriever,
-                                    return_source_documents=False,
-                                    chain_type_kwargs={'prompt': prompt}
-                                    )
-    response=chain({'query': user_input2})
-    
-    list = response["result"]
-    return list
+
 
 def get_response(messages, character):
     prompt_template = ChatPromptTemplate(
