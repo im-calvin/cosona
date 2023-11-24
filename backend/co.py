@@ -1,9 +1,17 @@
 from pypdf import PdfReader
-from db import store_pdf
 from api import co
+from langchain.chat_models import ChatCohere
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain.vectorstores import Chroma
+from langchain.memory import (
+    ConversationBufferMemory,
+)
+from langchain.prompts import PromptTemplate
+from langchain.chains import RetrievalQA
+from langchain.embeddings import CohereEmbeddings
 
 
-def get_character_list(text):
+def get_character_list(cohere_api_key, text):
     user_input2 = """List the main cast characters from the movie script. Answer only this this FORMAT:
                 The list of characters are:
                     -Character1 Full name
@@ -21,7 +29,7 @@ def get_character_list(text):
     chat_model = ChatCohere(
         cohere_api_key=cohere_api_key, model="command-light", temperature=0.0
     )
-    embeddings = CohereEmbeddings(cohere_api_key=cohere_api_key)
+    embeddings = CohereEmbeddings(cohere_api_key=cohere_api_key, truncate="start")
     # Create a vectorstore from documents
     vectorstore = Chroma.from_texts(texts, embeddings)
     # Create retriever interface
@@ -59,7 +67,7 @@ def get_character_list(text):
         chain_type_kwargs={"prompt": prompt},
     )
     response = chain({"query": user_input2})
-
+    print("response: " + response)
     lst = response["result"]
     return lst
 
@@ -82,7 +90,7 @@ def get_pdf_text(f):
     for page in range(len(reader.pages)):
         text += reader.pages[page].extract_text()
 
-    with open("backend/output.txt", "w", encoding="utf-8") as f:
+    with open("output.txt", "w", encoding="utf-8") as f:
         f.write(text)
 
     ### Remove all the side characters from the script

@@ -2,13 +2,12 @@ from flask import Flask, request
 import cohere
 from pymongo import MongoClient
 from dotenv import load_dotenv
-from werkzeug.utils import secure_filename
 import pprint
 from co import *
 import os
+from bson.objectid import ObjectId
 import gridfs
-from constants import COLLECTION_NAME, ALLOWED_EXTENSIONS, PROMPTS, NEW_PROMPTS
-from db import store_pdf
+from constants import COLLECTION_NAME, PROMPTS
 from langchain.chat_models import ChatCohere
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import LLMChain
@@ -44,10 +43,6 @@ def hello_world():
     return "Hello, World!"
 
 
-def allowed_file(filename):
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
 @app.route("/api/characters", methods=["GET"])
 def get_characters():
     # gets a list of characters from the pdf, requires the fileId as a query parameter
@@ -56,19 +51,23 @@ def get_characters():
         return {"error": "Please provide a fileId"}
 
     # try to get the file from gridfs
-    fs = gridfs.GridFS(cohere_db, collection=COLLECTION_NAME)
-    pdf_file = fs.get(fileId)
+    fs = gridfs.GridFS(database=cohere_db, collection=COLLECTION_NAME)
+    fs_file = ObjectId(fileId)
+    if not fs.exists(fs_file):
+        return {"error": "File not found"}
+    pdf_file = fs.get(fs_file)
 
     if pdf_file is None:
         return {"error": "File not found"}
 
-    # get the text from the pdf and then get the characters from the text
-    with open("pdf_file.pdf", "w") as f:
-        f.write(pdf_file)
+    # this doesn't scale
+    filename = "output.pdf"
+    with open(filename, "wb") as f:
+        f.write(pdf_file.read())
 
-    text = get_pdf_text(pdf_file)
+    text = get_pdf_text(filename)
 
-    characters = get_character_list(text)
+    characters = get_character_list(os.getenv("COHERE_API_KEY"), text)
 
     return {"characters": characters}
 
