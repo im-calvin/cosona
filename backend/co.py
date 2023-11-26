@@ -27,9 +27,11 @@ def get_character_list(cohere_api_key, text):
     texts = text_splitter.split_text(text)
     # Initialize the chat model for the character
     chat_model = ChatCohere(
-        cohere_api_key=cohere_api_key, model="command-light", temperature=0.0
+        cohere_api_key=cohere_api_key,
+        model="command-light",
+        temperature=0.0,
     )
-    embeddings = CohereEmbeddings(cohere_api_key=cohere_api_key, truncate="start")
+    embeddings = CohereEmbeddings(cohere_api_key=cohere_api_key)
     # Create a vectorstore from documents
     vectorstore = Chroma.from_texts(texts, embeddings)
     # Create retriever interface
@@ -38,7 +40,6 @@ def get_character_list(cohere_api_key, text):
     memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
     # prompt
     custom_prompt_template = """
-                    {context}
                     You are a character extracter bot. You're only job is to extract the main cast character names from a movie script.
                     Main cast characters will have more than 15 lines of dialogue. Do not include character with less than 10 dialogues in the character list
                     Extract the list of 5-6 main characters only from the movie script in the format
@@ -52,7 +53,7 @@ def get_character_list(cohere_api_key, text):
                         Who would you like to talk to? 
     
                     Always end the chat with "Who would you like to talk to?"                
-              
+                    {context}
             """
 
     prompt = PromptTemplate(
