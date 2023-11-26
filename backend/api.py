@@ -23,6 +23,8 @@ from langchain.chains import LLMChain
 from langchain.chat_models import ChatCohere
 from langchain.memory import ConversationBufferMemory
 from langchain.chains import LLMChain
+from langchain.output_parsers import CommaSeparatedListOutputParser
+from langchain.prompts import PromptTemplate
 import json
 
 load_dotenv() 
@@ -74,19 +76,13 @@ def chat():
     return response
     
 def get_character_list(text):
-    user_input2 = """List the main cast characters from the movie script. Answer only this this FORMAT:
-                The list of characters are:
-                    -Character1 Full name
-                    -Character2 Full Name
-                    -Character3 Full Name
-                    -Character4 Full Name
-                    -Character5 Full Name
-                    Who would you like to talk to? """
+   user_input = """List the main cast characters from the movie script. FORMAT:
+                Your response should be a list of comma separated values, eg: `Harry potter, Ron Weasley, Hagrid`"""
     # Define the character's name and description
     text_splitter = RecursiveCharacterTextSplitter(separators=["\n"],chunk_size=2500, chunk_overlap=300)
     texts = text_splitter.split_text(text)
     # Initialize the chat model for the character
-    chat_model = ChatCohere(cohere_api_key=cohere_api_key, model='command-light',temperature=0.0)
+    chat_model = ChatCohere(cohere_api_key=cohere_api_key, model='command-light',temperature=0.0,max_tokens=20, stop_sequences="Who would you like to talk to?")
     embeddings = CohereEmbeddings(cohere_api_key=cohere_api_key)
     # Create a vectorstore from documents
     vectorstore = Chroma.from_texts(texts, embeddings)
@@ -102,18 +98,7 @@ def get_character_list(text):
                     Main cast characters will have more than 15 lines of dialogue. Do not include character with less than 10 dialogues in the character list
                     Extract the list of 5-6 main characters only from the movie script in the format
                     FORMAT:
-                    The list of characters are:
-                        -Character1 Full name
-                        -Character2 Full Name
-                        -Character3 Full Name
-                        -Character4 Full Name
-                        -Character5 Full Name
-                        Who would you like to talk to? 
-    
-                    Always end the chat with "Who would you like to talk to?"
-    
-                    
-              
+                    Your response should be a list of comma separated values, eg: `Harry potter, Ron Weasley, Hagrid`
             """
     
     prompt = PromptTemplate(template=custom_prompt_template,
@@ -125,10 +110,11 @@ def get_character_list(text):
                                     return_source_documents=False,
                                     chain_type_kwargs={'prompt': prompt}
                                     )
-    response=chain({'query': user_input2})
+    response=chain({'query': user_input})
     
     list = response["result"]
-    return list
+    output_parser = CommaSeparatedListOutputParser()
+    output_parser.parse(list)
 
 def get_response(messages, character):
     prompt_template = ChatPromptTemplate(
