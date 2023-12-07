@@ -15,6 +15,6 @@ jobs:
       - name: Login to DockerHub
         run: docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build the Docker image
-        run: docker build backend/ --file Dockerfile --tag ${{ secrets.DOCKERHUB_USERNAME }}/cosona:latest
+        run: docker build --tag ${{ secrets.DOCKERHUB_USERNAME }}/cosona:latest backend/
       - name: Push Docker image
         run: docker push ${{secrets.DOCKERHUB_USERNAME}}/cosona:latest
