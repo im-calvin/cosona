@@ -28,6 +28,7 @@ const Create: NextPage = () => {
     });
     const data = await response.json();
     setCharacters(data.characters);
+    // setCharacters(['joemama', 'joebiden', 'joenutz', 'joebiden', 'joenutz', 'joebiden', 'joenutz', 'joebiden', 'joenutz', 'joebiden', 'joenutz', 'joebiden', 'joenutz']);
     setSelectionScreen(true);
   };
 
@@ -45,8 +46,8 @@ const Create: NextPage = () => {
               <div className={styles.characterList}>
                 {characters?.map((char, i) => {
                   return (
-                    <Link key={char} href={`/Chat?character=${char}`} passHref>
-                      <b className={`${styles.personas} justify-center`}>{char}</b>
+                    <Link className={`${styles.chatbtn} ${styles.selectChar}`} key={char} href={`/Chat?character=${char}`} passHref>
+                      <div>{char}</div>
                     </Link>
                   );
                 })}
