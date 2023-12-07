@@ -4,3 +4,5 @@ services:
     image: imcalvin/cosona:latest
     ports:
       - 43219:8080
+    env_file:
+      - stack.env

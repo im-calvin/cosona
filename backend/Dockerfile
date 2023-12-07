@@ -26,5 +26,4 @@ ENV FLASK_APP=api.py
 EXPOSE 8080
 
 # Run the application
-# CMD ["flask", "--app", "api", "run", "--port", "8080", "--host=0.0.0.0"]
 CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:8080", "api:app"]
