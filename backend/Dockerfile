@@ -13,6 +13,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 RUN pip install --no-cache-dir gunicorn
 
+# Install SQLite3
+RUN apt-get update && apt-get install -y sqlite3 libsqlite3-dev
+
 # Copy the source code
 COPY . /app
 
