@@ -27,6 +27,7 @@ from langchain.chains import LLMChain
 from langchain.output_parsers import CommaSeparatedListOutputParser
 from langchain.prompts import PromptTemplate
 import json
+import re
 
 load_dotenv()
 app = Flask(__name__)
@@ -61,10 +62,14 @@ def get_characters():
 
     characters = get_character_list(os.getenv("COHERE_API_KEY"), text)
     # remove all the text including the . from the last element in the array ("\n\nWould you like to know more about any of these characters?"")
-    modified_char = characters[-1].split(".")[0]
-    characters = characters[:-1]
-    characters.append(modified_char)
 
+    characters = characters[:-1]
+
+    pattern = r"\n\n.*"
+    modified_char = re.sub(pattern, "", characters[-1])
+
+    print(modified_char)
+    characters.append(modified_char)
     return {"characters": characters}
 
 
