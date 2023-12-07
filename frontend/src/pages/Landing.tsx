@@ -66,7 +66,7 @@ const Landing: FunctionComponent = () => {
       <div className="h-[513.26px] flex flex-col items-start justify-center py-1 px-[113px] box-border gap-[24px] text-left text-black">
         <div className="flex flex-col items-start justify-center py-0 px-[15px] text-[128px] font-nunito-sans">
           <b className="relative inline-block w-[698px] h-[158px] shrink-0 [transform:_rotate(0.19deg)] [transform-origin:0_0]">
-            <p className="m-0">Co:Sona</p>
+            <p className="m-0">CoSona</p>
           </b>
           <img
             className="relative w-[218px] h-[36.59px]"

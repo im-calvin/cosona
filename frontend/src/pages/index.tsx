@@ -59,7 +59,7 @@ const Landing: NextPage = () => {
       <div className={styles.frameParent}>
         <div className={styles.cosonaParent}>
           <b className={styles.cosona}>
-            <p className={styles.bringCharactersFrom}>Co:Sona</p>
+            <p className={styles.bringCharactersFrom}>CoSona</p>
           </b>
           <Image
             className={styles.cohereLogoIcon}

@@ -17,7 +17,7 @@ const PersonasDesignA: FunctionComponent = () => {
                 src="/vector-traced.svg"
               />
               <div className="flex flex-col items-center justify-center">
-                <b className="relative">Co:Sonas</b>
+                <b className="relative">CoSonas</b>
                 <img
                   className="relative w-[85.64px] h-[14.37px] mt-[-2px]"
                   alt=""
@@ -33,7 +33,7 @@ const PersonasDesignA: FunctionComponent = () => {
                   src="/vector.svg"
                 />
                 <b className="self-stretch flex-1 relative flex items-center justify-center">
-                  Co:Sonas
+                  CoSonas
                 </b>
               </div>
             </div>
@@ -62,7 +62,7 @@ const PersonasDesignA: FunctionComponent = () => {
                 alt=""
                 src="/useralt.svg"
               />
-              <div className="flex-1 relative">My Co:Sonas</div>
+              <div className="flex-1 relative">My CoSonas</div>
             </div>
             <div className="self-stretch rounded-mini bg-tomato h-[60px] flex flex-row items-center justify-center py-[15px] px-[18px] box-border gap-[10px]">
               <img

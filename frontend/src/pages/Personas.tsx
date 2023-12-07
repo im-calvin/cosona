@@ -51,7 +51,7 @@ const PersonasDesignA: NextPage = () => {
                 height={95}
               />
               <div className={styles.cosonasParent}>
-                <b className={styles.cosonas}>Co:Sonas</b>
+                <b className={styles.cosonas}>CoSonas</b>
                 <Image
                   className={styles.cohereLogoWhiteIcon}
                   alt=""

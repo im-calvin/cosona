@@ -37,7 +37,7 @@ const Create: NextPage = () => {
       <NavBar />
       <div className={styles.frameParent}>
         <div className={styles.createYourCosonaWrapper}>
-          <b className={styles.createYourCosona}>Create Your Co:Sona</b>
+          <b className={styles.createYourCosona}>Create Your CoSona</b>
         </div>
         <div className={styles.frameGroup}>
           {selectionScreen ? (
@@ -75,7 +75,7 @@ const Create: NextPage = () => {
                 <div className="no-underline">
                   <form onSubmit={handleSubmit}>
                     <button className={styles.createYourCosonaContainer}>
-                      <div className={styles.personas}>Create Your Co:Sona</div>
+                      <div className={styles.personas}>Create Your CoSona</div>
                     </button>
                   </form>
                 </div>
