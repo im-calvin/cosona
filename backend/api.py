@@ -32,8 +32,6 @@ import re
 load_dotenv()
 app = Flask(__name__)
 CORS(app, origins=["http://localhost:3000", "https://cosona.vercel.app"])
-dbClient = MongoClient(os.getenv("ATLAS_URI"))
-cohere_db = dbClient[os.getenv("DB_NAME")]
 printer = pprint.PrettyPrinter(indent=4)
 co = cohere.Client(os.getenv("COHERE_API_KEY"))
 chat_model = ChatCohere(
