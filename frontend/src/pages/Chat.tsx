@@ -145,11 +145,7 @@ const ChatDesignA: NextPage = () => {
               <CosanaBtn text="" href="/Create" icon="create" type="createbtnmd" />
               <CosanaBtn text="" href="/Personas" icon="persona" type="personasbtnmd" />
             </div>
-            <MenuBtn name="Character 1" selected={true} />
-            <MenuBtn name="Character 2" href="/Chat?character=tonystark" selected={false} />
-            <MenuBtn name="Character 3" selected={false} />
-            <MenuBtn name="Character 4" selected={false} />
-            <MenuBtn name="Character 5" selected={false} />
+            <MenuBtn name="Active Chat" selected={true} />
           </div>
         </div>
         <div className={styles.colRight}>
