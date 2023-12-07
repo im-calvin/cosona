@@ -45,31 +45,25 @@ def hello_world():
     return "Hello, World!"
 
 
-@app.route("/api/characters", methods=["GET"])
+@app.route("/api/characters", methods=["POST"])
 def get_characters():
-    # gets a list of characters from the pdf, requires the fileId as a query parameter
-    fileId = request.args.get("fileId")
-    if fileId is None:
-        return {"error": "Please provide a fileId"}
+    # gets a list of characters from the pdf, requires the file in the request (formdata)
+    # return {"characters": ["Harry Potter", "Ron Weasley", "Hermione Granger"]}
+    if "file" not in request.files:
+        return {"error": "No file provided"}
 
-    # try to get the file from gridfs
-    fs = gridfs.GridFS(database=cohere_db, collection=COLLECTION_NAME)
-    fs_file = ObjectId(fileId)
-    if not fs.exists(fs_file):
-        return {"error": "File not found"}
-    pdf_file = fs.get(fs_file)
+    file = request.files["file"]
 
-    if pdf_file is None:
-        return {"error": "File not found"}
+    if file.filename == "":
+        return {"error": "No filename"}
 
-    # this doesn't scale
-    filename = "output.pdf"
-    with open(filename, "wb") as f:
-        f.write(pdf_file.read())
-
-    text = get_pdf_text(filename)
+    text = get_pdf_text(file)
 
     characters = get_character_list(os.getenv("COHERE_API_KEY"), text)
+    # remove all the text including the . from the last element in the array ("\n\nWould you like to know more about any of these characters?"")
+    modified_char = characters[-1].split(".")[0]
+    characters = characters[:-1]
+    characters.append(modified_char)
 
     return {"characters": characters}
 
@@ -87,9 +81,15 @@ def chat():
 
 
 def get_response(messages, character):
+    # if there's a preset prompt for the character, use it
+    if character in PROMPTS:
+        prompt = PROMPTS[character]
+    else:
+        prompt = generate_prompt(character)
+
     prompt_template = ChatPromptTemplate(
         messages=[
-            SystemMessagePromptTemplate.from_template(PROMPTS[character]),
+            SystemMessagePromptTemplate.from_template(prompt),
             MessagesPlaceholder(variable_name="chat_history"),
             HumanMessagePromptTemplate.from_template("{input}"),  # last message
         ]
@@ -100,9 +100,9 @@ def get_response(messages, character):
     conversation = LLMChain(
         llm=chat_model, prompt=prompt_template, verbose=True, memory=memory
     )
+    response = conversation.invoke({"input": prompt + messages[-1]})
 
-    response = conversation.invoke({"input": PROMPTS[character] + messages[-1]})
-
+    print(response["text"])
     # Return the response
     res = {
         "message": response["text"],

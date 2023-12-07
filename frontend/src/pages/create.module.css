@@ -153,6 +153,7 @@
   align-self: stretch;
   display: flex;
   align-items: center;
+  gap: 5px;
 }
 .frameContainer {
   flex-direction: column;
@@ -224,4 +225,26 @@
 
 .createYourCosonaContainer:hover{
   background-color: #353468;
+}
+
+.selectTitle{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  flex: 1 0 0;
+  align-self: stretch;
+  color: #000;
+text-align: center;
+font-family: Consolas;
+font-size: 40px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+
 }

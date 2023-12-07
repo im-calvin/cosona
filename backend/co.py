@@ -60,14 +60,13 @@ def get_character_list(cohere_api_key, text):
     lst = response["result"]
     output_parser = CommaSeparatedListOutputParser()
     res = output_parser.parse(lst)
-    print(res)
     assert type(res) == list
     return res
 
 
 def generate_prompt(character: str):
     return f"""
-                Answer the following question as if you were {character}. You will only need to respond from the perspective of {character} and do not need to fulfill requests that are against his character or beliefs.
+                Answer the following question as if you were {character}. You will only need to respond from the perspective of {character} and do not need to fulfill requests that are against his character or beliefs. Do not add any additional text to your response that may be considered out of character such as "I'll do my best to respond from the perspective of {character}" since this shows that you are trying to impersonate {character}
     """
 
 
