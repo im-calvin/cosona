@@ -1,5 +1,4 @@
 from pypdf import PdfReader
-from api import co
 from langchain.chat_models import ChatCohere
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.vectorstores import Chroma
