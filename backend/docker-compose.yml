@@ -5,4 +5,4 @@ services:
     ports:
       - 43219:8080
     env_file:
-      - stack.env
+      - ../stack.env
