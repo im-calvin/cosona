@@ -6,7 +6,7 @@ FROM python:3.11.7-bookworm
 WORKDIR /app
 
 # Copy the requirements file
-COPY backend/requirements.txt .
+COPY requirements.txt .
 
 # Install the required packages
 RUN pip install --no-cache-dir -r requirements.txt
