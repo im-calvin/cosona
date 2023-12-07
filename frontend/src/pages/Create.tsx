@@ -22,12 +22,12 @@ const Create: NextPage = () => {
     // get the list of characters from the backend
     const formData = new FormData();
     formData.append("file", file);
-    // const response = await fetch(`${getAPIEndpoint()}/api/characters`, {
-    //   method: "POST",
-    //   body: formData,
-    // });
-    // const data = await response.json();
-    // setCharacters(data.characters);
+    const response = await fetch(`${getAPIEndpoint()}/api/characters`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await response.json();
+    setCharacters(data.characters);
     setSelectionScreen(true);
   };
 
