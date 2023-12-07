@@ -56,6 +56,8 @@
   padding: var(--padding-3xs) var(--padding-11xl);
   gap: var(--gap-3xs);
   cursor: pointer;
+  text-decoration: none;
+  color: white;
 }
 .vectorIcon2 {
   position: relative;
@@ -125,7 +127,7 @@
 }
 .name {
   flex: 1;
-  position: relative;  
+  position: relative;
   font-size: 30px;
 }
 .nameContainer,
@@ -175,7 +177,6 @@
   justify-content: center;
 }
 .createYourCosonaContainer {
-  
   background-color: var(--color-darkslateblue);
   display: flex;
   flex-direction: row;
@@ -186,13 +187,13 @@
   color: var(--color-white);
 }
 .frameGroup {
-  align-self: stretch;
   background-color: #eaddc2;
   padding: 87px 124px;
   gap: var(--gap-3xs);
   text-align: left;
   font-size: var(--font-size-11xl);
   font-family: var(--font-consolas);
+  max-height: 50vh;
 }
 .create,
 .frameGroup,
@@ -223,11 +224,11 @@
   font-family: var(--font-consolas);
 }
 
-.createYourCosonaContainer:hover{
+.createYourCosonaContainer:hover {
   background-color: #353468;
 }
 
-.selectTitle{
+.selectTitle {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -236,15 +237,29 @@
   align-self: stretch;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   flex: 1 0 0;
   align-self: stretch;
   color: #000;
-text-align: center;
-font-family: Consolas;
-font-size: 40px;
-font-style: normal;
-font-weight: 700;
-line-height: normal;
+  text-align: center;
+  font-family: Consolas;
+  font-size: 55px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: normal;
+  background-color: #ff7759;
+  border-radius: var(--br-mini);
+  padding: 15px;
+}
+.characterList {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  border-radius: var(--br-mini);
+  max-height: 40vh;
+  margin-top: 20px;
+}
 
+.selectChar {
+  margin-top: 10px;
+  font-size: 45px;
 }
